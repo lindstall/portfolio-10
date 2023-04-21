@@ -1,0 +1,146 @@
+---
+title: "portfolio"
+output: html_document
+date: "2023-04-21"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(readxl)
+library(ggplot2)
+library(dplyr)
+df <- read_excel("/Users/lindsaystall/Downloads/PIRUS_Public_May2020.xlsx")
+df[df == -99 | df == -88] <- NA
+```
+
+
+```{r}
+df2 <- data.frame(table(df$Previous_Criminal_Activity))
+
+ggplot(df2, aes(x = Var1, y = Freq)) +
+  geom_bar(stat = "identity", fill = "pink", color = "black") +
+  xlab("Previous Criminal Activity") +
+  ylab("Count") +
+  ggtitle("Previous Criminal Activity for Females") +
+  theme_bw()
+```
+
+0 = No previous criminal activity
+1 = Previous (non-violent) minor criminal activity (e.g., convicted of a misdemeanor crime) 
+2 = Previous (non-violent) serious criminal activity (e.g., convicted of a felony crime)
+3 = Previous violent crime
+
+Most terrorists in this data set have no previous criminal activity
+
+```{r}
+df %>% 
+  filter(!is.na(Previous_Criminal_Activity_Type1)) %>% 
+  group_by(Previous_Criminal_Activity_Type1) %>% 
+  summarize(count = n()) %>% 
+  arrange(desc(count))
+```
+
+1 = Homicide
+2 = Forcible Rape
+3 = Robbery
+4 = Aggravated Assault 
+5 = Burglary
+6 = Larceny-Theft
+7 = Motor Vehicle Theft 
+8 = Arson
+9 = Simple Assault
+10 = Fraud
+11 = Forgery
+12 = Embezzlement
+13 = Driving Under the Influence (DUI)/Driving While Intoxicated (DWI)
+14 = Prostitution
+15 = Vandalism
+16 = Drug related (e.g., selling/distributing drugs, cultivating drugs, but not simply drug use).
+17 = Parole violation
+18 = Unlawful possession, transportation, or use of a firearm 
+19 = Domestic violence/spousal abuse
+20 = Other
+
+Of the terrorists with previous charges, the most common charges was Aggravated Assault, Robbery, and Simple Assault. 
+
+
+```{r}
+psych_df <- data.frame(count = c(
+  sum(df$Psychological == 0, na.rm = TRUE),
+  sum(df$Psychological == 1, na.rm = TRUE),
+  sum(df$Psychological == 2, na.rm = TRUE)
+), 
+value = c("No", "Speculation", "Professionally Diagnosed"))
+
+ggplot(data = psych_df, aes(x="", y=count, fill=value)) +
+  geom_bar(width = 1, stat = "identity") +
+  coord_polar(theta = "y") +
+  labs(fill="Psychological") +
+  theme_void()
+```
+
+The vast majority of terrorists do not have a reported or speculated mental illness. I know this is very much in line with existing literature.
+
+
+```{r}
+counts <- table(df$Social_Stratum_Childhood)
+
+ggplot(data.frame(Social_Stratum_Childhood = names(counts), counts), aes(x = Social_Stratum_Childhood, y = counts)) +
+  geom_bar(stat = "identity", fill = "pink", color = "black") +
+  ggtitle("Social Stratum in Childhood") +
+  xlab("Social Stratum") +
+  ylab("Count")
+```
+
+1 = Low (e.g. receives welfare, lives close to the poverty line, regularly unemployed or at best works a blue collar job, lives in subsidized housing)
+2 = Middle (e.g. does not receive welfare, lives in lower-middle or middle class neighborhood, has steady professional employment, owns or holds a mortgage on a house, has college degree)
+3 = High (e.g. works a high-income, white-collar job, lives and owns a house in a middle or upper class neighborhood, can afford luxury items, has college degree or is self-employed as a successful entrepreneur)
+
+
+Most terrorists grew up middle class.
+
+
+```{r}
+counts2 <- table(df$Social_Stratum_Adulthood)
+
+ggplot(data.frame(Social_Stratum_Adulthood = names(counts2), counts2), aes(x = Social_Stratum_Adulthood, y = counts)) +
+  geom_bar(stat = "identity", fill = "pink", color = "black") +
+  ggtitle("Social Stratum in Adulthood") +
+  xlab("Social Stratum") +
+  ylab("Count")
+```
+
+Most terrorists remained middle class into adulthood
+
+```{r}
+table(df$Alcohol_Drug)
+```
+
+The vast majority of terrorists (89%) do not have a alcohol or drug problem.
+
+
+```{r}
+ggplot(df, aes(x = Absent_Parent)) +
+  geom_histogram(binwidth = 1, fill = "pink", color = "black") +
+  labs(x = "Absent Parent", y = "Count", title = "Histogram of Absent Parent")
+```
+0 = No
+1 = Yes, absent mother 
+2 = Yes, absent father 
+3 = Yes, both absent
+
+Most terrorists did not have absent parents.
+
+```{r}
+ggplot(df, aes(x = Close_Family)) +
+  geom_histogram(binwidth = 1, fill = "pink", color = "black") +
+  labs(x = "Family closeness", y = "Count", title = "Histogram of AFamily Closeness")
+```
+
+1 = Distant (has little regular contact with most family members, rarely attends family events, does not celebrate holidays with family, etc.)
+2 = Close (regularly interacts with one or more family members, attends family events on a regular basis, usually celebrates holidays with family, etc.)
+
+
+Most terrorists have close relationships with family!!!
+
